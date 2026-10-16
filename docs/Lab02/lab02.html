@@ -1,115 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lab02 — Godot Game</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #1a1a2e; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    min-height: 100vh; font-family: 'Segoe UI', sans-serif; color: #e0e0e0;
-  }
-  .godot-header { font-size: 11px; color: #666; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1rem; }
-  .canvas-wrap {
-    position: relative; background: #000;
-    border: 2px solid #2a2a4a; border-radius: 4px; overflow: hidden;
-    width: 640px; height: 360px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .overlay {
-    position: absolute; inset: 0; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #0d0d1a; gap: 1rem;
-  }
-  .game-title { font-size: 28px; font-weight: 700; color: #fff; }
-  .game-sub   { font-size: 14px; color: #888; }
-  .play-btn {
-    margin-top: .5rem; padding: 10px 32px; border-radius: 6px;
-    background: #478cbf; color: #fff; border: none;
-    font-size: 16px; font-weight: 600; cursor: pointer; transition: background .15s;
-  }
-  .play-btn:hover { background: #5a9fd4; }
-  .mock-badge {
-    position: absolute; top: 10px; right: 10px;
-    background: #ff6b35; color: #fff; font-size: 10px; font-weight: 700;
-    padding: 3px 8px; border-radius: 4px; letter-spacing: .05em;
-  }
-  .progress-wrap {
-    width: 640px; background: #111;
-    border: 1px solid #2a2a4a; border-top: none;
-    border-radius: 0 0 4px 4px; padding: .5rem .75rem;
-    display: flex; align-items: center; gap: .75rem;
-  }
-  .progress-bar { flex: 1; height: 6px; background: #222; border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 100%; width: 0; background: #478cbf; border-radius: 3px; transition: width .05s; }
-  .progress-label { font-size: 11px; color: #666; white-space: nowrap; }
-  .back-link { margin-top: 1rem; font-size: 13px; color: #555; text-decoration: none; transition: color .15s; }
-  .back-link:hover { color: #aaa; }
-  .game-scene {
-    display: none; width: 100%; height: 100%;
-    background: #0a1a0a; position: relative; overflow: hidden;
-  }
-  .game-scene .player {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    width: 24px; height: 24px;
-    background: #4ade80; border-radius: 50%;
-    animation: pulse 1s ease-in-out infinite alternate;
-  }
-  .game-scene .enemy {
-    position: absolute; width: 20px; height: 20px;
-    background: #f87171; border-radius: 3px;
-    animation: move 2s ease-in-out infinite alternate;
-  }
-  .game-scene .score { position: absolute; top: 12px; left: 12px; font-size: 14px; font-weight: 600; color: #4ade80; }
-  .game-scene .hp    { position: absolute; top: 12px; right: 12px; font-size: 14px; font-weight: 600; color: #f87171; }
-  @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(74,222,128,.4); } to { box-shadow: 0 0 0 8px rgba(74,222,128,0); } }
-  @keyframes move  { from { transform: translate(0,0); } to { transform: translate(40px, 20px); } }
-</style>
-</head>
-<body>
-<div class="godot-header">Godot Engine — HTML5 Export</div>
-<div class="canvas-wrap" id="canvas-wrap">
-  <div class="overlay" id="overlay">
-    <div class="game-title">Lab 02</div>
-    <div class="game-sub">ตัวอย่างเกม Godot Export</div>
-    <button class="play-btn" onclick="startGame()">▶ Play</button>
-    <div class="mock-badge">MOCK EXPORT</div>
-  </div>
-  <div class="game-scene" id="game-scene">
-    <div class="score" id="score">Score: 0</div>
-    <div class="hp">HP: ♥♥♥</div>
-    <div class="player"></div>
-    <div class="enemy" style="top:20%; left:15%"></div>
-    <div class="enemy" style="top:60%; left:70%; animation-delay:.5s"></div>
-    <div class="enemy" style="top:30%; left:80%; animation-delay:1s"></div>
-    <div class="mock-badge">MOCK EXPORT</div>
-  </div>
-</div>
-<div class="progress-wrap" id="progress-wrap" style="display:none">
-  <div class="progress-bar"><div class="progress-fill" id="pfill"></div></div>
-  <div class="progress-label" id="plabel">Loading... 0%</div>
-</div>
-<a class="back-link" href="../">← กลับ Homepage</a>
-<script>
-function startGame(){
-  document.getElementById('overlay').style.display='none';
-  document.getElementById('progress-wrap').style.display='flex';
-  var fill=document.getElementById('pfill'), label=document.getElementById('plabel'), pct=0;
-  var files=['lab02.js','lab02.wasm','lab02.pck'];
-  var iv=setInterval(function(){
-    pct+=Math.random()*8+2;
-    if(pct>=100){pct=100;clearInterval(iv);label.textContent='Done!';setTimeout(showGame,300);}
-    else{var i=Math.floor((pct/100)*files.length);label.textContent='Loading '+(files[i]||files[files.length-1])+'... '+Math.floor(pct)+'%';}
-    fill.style.width=pct+'%';
-  },80);
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>Lab 2</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
 }
-function showGame(){
-  document.getElementById('progress-wrap').style.display='none';
-  document.getElementById('game-scene').style.display='block';
-  var s=0; setInterval(function(){s+=50;document.getElementById('score').textContent='Score: '+s;},800);
+
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
 }
-</script>
-</body>
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
+
+#status {
+	background-color: #242424;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
+
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
+
+#status-splash.show-image--false {
+	display: none;
+}
+
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
+
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
+
+#status-progress, #status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="game22.icon.png" />
+<link rel="apple-touch-icon" href="game22.apple-touch-icon.png"/>
+
+	</head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="game22.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+
+		<script src="game22.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"game22","experimentalVK":false,"fileSizes":{"game22.pck":2069956,"game22.wasm":39509339},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	</body>
 </html>
+
